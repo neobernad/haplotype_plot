@@ -17,6 +17,13 @@ class TestConversion(unittest.TestCase):
         converter.vcf_to_hdf5(vcf_path, hdf5_path)
         assert os.path.exists(hdf5_path)
 
+    def test_get_samples(self):
+        vcf_path = "data/chr01.vcf"
+        sample_list = converter.get_samples(vcf_path)
+        print("Samples in '{vcf_path}' are: {sample_list}".format(vcf_path=vcf_path,
+                                                                  sample_list=sample_list))
+        assert sample_list
+
 
 if __name__ == '__main__':
     unittest.main()

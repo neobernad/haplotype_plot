@@ -1,8 +1,25 @@
 # -*- coding: utf-8 -*-
 import logging
+import vcf  # from PyVCF
 import allel
 
 logger = logging.getLogger()
+
+
+def get_samples(vcf_path: str) -> list:
+    """ Reads the sample list from a VCF file.
+
+        Parameters:
+            vcf_path (str): Input path to the VCF file.
+        Returns:
+            A list of strings (samples names)
+    """
+    sample_list = list()
+    vcf_file = open(vcf_path, 'r')
+    vcf_reader = vcf.Reader(vcf_file)
+    sample_list = vcf_reader.samples
+    vcf_file.close()
+    return sample_list
 
 
 def vcf_to_hdf5(vcf_path: str, hdf5_path: str):
