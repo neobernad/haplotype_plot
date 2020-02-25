@@ -9,7 +9,8 @@ import haplotyper.conversion as converter
 import haplotyper.filter as strainer
 import numpy as np
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 
 def debug_hdf5(hdf5_path: str):
@@ -48,11 +49,11 @@ def _has_chromosome(variants: allel.VariantChunkedTable, chrom: str):
         Returns:
             bool: True if chromosome 'chrom' is present in the table 'variants'
     """
-    filter_expression = '(CHROM == \'' + chrom + '\')'
-    return strainer.variants_filter(variants, filter_expression)
+    np_array = strainer.variants_filter_by_chrom(variants, chrom)
+    return np.count_nonzero(np_array)
 
 
-def _get_sample_index(sample_list: list, sample: str) -> int:
+def get_sample_index(sample_list: list, sample: str) -> int:
     """ Returns the index of a sample in a sample list.
 
         Parameters:
@@ -74,16 +75,15 @@ def _get_sample_index(sample_list: list, sample: str) -> int:
 
 
 def _sort_genotypes(genotypes: allel.GenotypeChunkedArray,
-                    sample_list: list, parental_sample_index: int) -> allel.GenotypeChunkedArray:
+                    parental_sample_index: int) -> allel.GenotypeChunkedArray:
     """ Sorts an allel.GenotypeChunkedArray object, placing the sample selected as parental
         'parental_sample_index' as the first genotype listed in 'genotypes'.
 
         Parameters:
-            genotypes (allel.GenotypeChunkedArray): List of samples (strings) present in the VCF file.
-            sample_list (list: str): List of samples (strings) present in the VCF file.
+            genotypes (allel.GenotypeChunkedArray): GenotypesChunkedArray object.
             parental_sample_index (int): Index in the 'sample_list' of the parental sample
         Returns:
-            integer: The index of input sample in the sample list.
+            The allel.GenotypeChunkedArray object but sorted.
     """
     selected_progeny = np.repeat(True, genotypes.n_samples)
     selected_progeny[parental_sample_index] = False
@@ -96,24 +96,27 @@ def _sort_genotypes(genotypes: allel.GenotypeChunkedArray,
     return genotype
 
 
-def process_haplotypes(vcf_file_path: str, chrom: str, parental_sample: str):
+def process(vcf_file_path: str, chrom: str,
+            sample_list: list,
+            parental_sample: str) -> (allel.GenotypeArray, allel.VariantTable):
     """ Returns a the genotypes and variants tables from an hdf5.
 
         Parameters:
             vcf_file_path (str): Input path to the VCF file.
-            chrom (str): What chromosome should be considered for the haplotype process
+            chrom (str): What chromosome should be considered for the haplotype process.
+            sample_list (list :str): Sample list present in the VCF.
             parental_sample (str): Sample name that is considered as the parental one.
         Returns:
            Nothing.
     """
     vcf_file_abspath = os.path.abspath(vcf_file_path)
     vcf_path = os.path.dirname(vcf_file_abspath)
-    hdf5_filename = os.path.splitext(vcf_file_abspath)[0] + ".h5"
+    hdf5_filename = os.path.splitext(vcf_file_abspath)[0] + constants.HDF5_EXT
     hdf5_file_path = os.path.join(vcf_path, hdf5_filename)
 
     converter.vcf_to_hdf5(vcf_file_path, hdf5_file_path)
-    sample_list = converter.get_samples(vcf_file_path)
-    parental_sample_index = _get_sample_index(sample_list, parental_sample)
+
+    parental_sample_index = get_sample_index(sample_list, parental_sample)
     genotypes, variants = get_genotypes_n_variants(hdf5_file_path)
     if not _has_chromosome(variants, chrom):
         msg = "Chromosome '{chrom}' not found in the VCF '{vcf_file_path}'".format(
@@ -123,5 +126,28 @@ def process_haplotypes(vcf_file_path: str, chrom: str, parental_sample: str):
         logger.error(msg)
         raise ValueError(msg)
 
-    genotypes = _sort_genotypes(genotypes, sample_list, parental_sample_index)
-    # TODO: Filter genotypes and variants with ac.is_segregating(), or variant_selection for chrom
+    genotypes = _sort_genotypes(genotypes, parental_sample_index)
+    genotypes_uc, variants_uc = strainer.filters_for_haplotyping(genotypes, variants, chrom)
+    genotypes_uc, variants_uc = strainer.filter_phasing(genotypes_uc, variants_uc)
+    return genotypes_uc, variants_uc
+
+
+def get_haplotypes(genotypes_un: allel.GenotypeArray) -> (allel.HaplotypeArray, allel.HaplotypeArray):
+    """ Returns a the parent and progeny haplotypes from a given 'allel.GenotypeArray'.
+
+        Parameters:
+            genotypes_un (allel.GenotypeArray): allel.GenotypeArray object.
+        Returns:
+           Tuple (allel.HaplotypeArray, allel.HaplotypeArray):
+                - allel.HaplotypeArray: Parent in an 'allel.HaplotypeArray' object.
+                - allel.HaplotypeArray: Parent and progeny in an 'allel.HaplotypeArray' object.
+    """
+    # Parent genotype
+    genotypes_parent = genotypes_un[:, 0]
+    # Convert to haplotype array
+    haplotypes_parent = genotypes_parent.to_haplotypes()
+    # Pull out the "left" allele (haplotypes) from the other samples in the VCF, treated as progeny
+    haplotypes_rest_varieties = allel.HaplotypeArray(genotypes_un[:, 1:, 0])
+    # Stack parent's haplotypes alongside haplotypes it transmitted to its progeny
+    haplotypes_parent_n_progeny = haplotypes_parent.concatenate(haplotypes_rest_varieties, axis=1)
+    return haplotypes_parent, haplotypes_parent_n_progeny
