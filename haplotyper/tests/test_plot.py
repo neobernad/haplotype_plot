@@ -34,12 +34,16 @@ class TestPlotting(unittest.TestCase):
         genotypes_uc, variants_uc = genotyper.process(self.vcf_path, self.chrom, sample_list, self.parental_sample)
         parent_haplotypes, all_haplotypes = genotyper.get_haplotypes(genotypes_uc)
 
+        ytickslabels = hplot.get_ytickslabels(sample_list, self.parental_sample)
+
         plot_config = hplot.PlotConfig(
             title="Parent {parent} in chr {chrom}".format(parent=self.parental_sample, chrom=self.chrom),
             xtickslabels=hplot.get_xtickslabels(variants_uc),
-            ytickslabels=hplot.get_ytickslabels(sample_list, self.parental_sample),
-            start=0,
-            end=0
+            ytickslabels=ytickslabels,
+            start=50,
+            end=60,
+            size_x=10,
+            size_y=len(ytickslabels) * .2
         )
 
         hplot.plot_haplotypes(variants_uc, parent_haplotypes,
