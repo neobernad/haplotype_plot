@@ -85,10 +85,10 @@ def plot_haplotypes(variants_uc: allel.VariantChunkedTable, parent_haplotypes: a
 
 
 def _crop_painting_dimension(painting: np.ndarray, plot_config: PlotConfig):
-    '''
-        TODO: This plots works for homogeneous haplotypes, create antoher one with different axis
-        SAMPLE1_1, SAMPLE1_2, SAMPLE2_1, SAMPLE2_2, etc..
-    '''
+
+    # TODO: This plots works for homozygous haplotypes, create another one for heterozygous
+    # SAMPLE1_1, SAMPLE1_2, SAMPLE2_1, SAMPLE2_2, etc..
+
     start: int = plot_config.start
     end: int = plot_config.end
 

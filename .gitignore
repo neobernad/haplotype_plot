@@ -1,5 +1,5 @@
 # Test data
-haplotyper/tests/data
+haplotyper/tests/data/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
