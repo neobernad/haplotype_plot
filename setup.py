@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 from setuptools import setup
 
-import haplotyper
+import haplotype_plot
 
 setup(
     name='haplotype_plot',
-    version=haplotyper.version,
-    packages=['haplotyper', 'haplotyper.tests'],
+    version=haplotype_plot.version,
+    packages=['haplotype_plot', 'haplotype_plot.tests'],
     url='https://github.com/neobernad/haplotype_plot',
     license='MIT',
     author='José Antonio Bernabé Díaz',

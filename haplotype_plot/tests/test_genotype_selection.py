@@ -1,7 +1,7 @@
 import unittest
 import pprint
-import haplotyper.genotyper as genotyper
-import haplotyper.conversion as converter
+import haplotype_plot.genotyper as genotyper
+import haplotype_plot.conversion as converter
 
 
 class TestGenotyper(unittest.TestCase):
@@ -23,9 +23,9 @@ class TestGenotyper(unittest.TestCase):
         chrom = "chr01"
         parental_sample = "SAMPLE1"
         sample_list = converter.get_samples(vcf_path)
-        genotypes_uc, variants_uc = genotyper.process(vcf_path, chrom, sample_list, parental_sample)
-        genotypes_uc_len = len(genotypes_uc)
-        variants_uc_len = len(variants_uc)
+        haplotype_wrapper = genotyper.process_homozygous(vcf_path, chrom, sample_list, parental_sample)
+        genotypes_uc_len = len(haplotype_wrapper.genotypes)
+        variants_uc_len = len(haplotype_wrapper.variants)
         print("Length genotypes: " + str(genotypes_uc_len))
         print("Length variants: " + str(variants_uc_len))
         assert genotypes_uc_len == variants_uc_len

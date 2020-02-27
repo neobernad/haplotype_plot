@@ -4,9 +4,10 @@ import allel
 import h5py
 import os
 import os.path
-import haplotyper.constants as constants
-import haplotyper.conversion as converter
-import haplotyper.filter as strainer
+import haplotype_plot.constants as constants
+import haplotype_plot.conversion as converter
+import haplotype_plot.filter as strainer
+import haplotype_plot.haplotyper as haplotyper
 import numpy as np
 
 logger = logging.getLogger(__name__)
@@ -96,10 +97,10 @@ def _sort_genotypes(genotypes: allel.GenotypeChunkedArray,
     return genotype
 
 
-def process(vcf_file_path: str, chrom: str,
-            sample_list: list,
-            parental_sample: str) -> (allel.GenotypeArray, allel.VariantTable):
-    """ Returns a the genotypes and variants tables from an hdf5.
+def _process(vcf_file_path: str, chrom: str,
+             sample_list: list,
+             parental_sample: str) -> haplotyper.HaplotypeWrapper:
+    """ Returns a 'haplotyper.HaplotypeWrapper' object.
 
         Parameters:
             vcf_file_path (str): Input path to the VCF file.
@@ -107,7 +108,7 @@ def process(vcf_file_path: str, chrom: str,
             sample_list (list :str): Sample list present in the VCF.
             parental_sample (str): Sample name that is considered as the parental one.
         Returns:
-           Nothing.
+           haplotyper.HaplotypeWrapper: Wrapper containing genotypes and variants.
     """
     vcf_file_abspath = os.path.abspath(vcf_file_path)
     vcf_path = os.path.dirname(vcf_file_abspath)
@@ -129,25 +130,40 @@ def process(vcf_file_path: str, chrom: str,
     genotypes = _sort_genotypes(genotypes, parental_sample_index)
     genotypes_uc, variants_uc = strainer.filters_for_haplotyping(genotypes, variants, chrom)
     genotypes_uc, variants_uc = strainer.filter_phasing(genotypes_uc, variants_uc)
-    return genotypes_uc, variants_uc
+    return haplotyper.HaplotypeWrapper(genotypes_uc, variants_uc, chrom, sample_list, parental_sample)
 
 
-def get_haplotypes(genotypes_un: allel.GenotypeArray) -> (allel.HaplotypeArray, allel.HaplotypeArray):
-    """ Returns a the parent and progeny haplotypes from a given 'allel.GenotypeArray'.
+def process_homozygous(vcf_file_path: str, chrom: str,
+                       sample_list: list,
+                       parental_sample: str) -> haplotyper.HaplotypeWrapper:
+    """ Returns a 'haplotyper.HaplotypeWrapper' object.
 
         Parameters:
-            genotypes_un (allel.GenotypeArray): allel.GenotypeArray object.
+            vcf_file_path (str): Input path to the VCF file.
+            chrom (str): What chromosome should be considered for the haplotype process.
+            sample_list (list :str): Sample list present in the VCF.
+            parental_sample (str): Sample name that is considered as the parental one.
         Returns:
-           Tuple (allel.HaplotypeArray, allel.HaplotypeArray):
-                - allel.HaplotypeArray: Parent in an 'allel.HaplotypeArray' object.
-                - allel.HaplotypeArray: Parent and progeny in an 'allel.HaplotypeArray' object.
+           haplotyper.HaplotypeWrapper: Wrapper containing genotypes, variants and homozygous haplotypes.
     """
-    # Parent genotype
-    genotypes_parent = genotypes_un[:, 0]
-    # Convert to haplotype array
-    haplotypes_parent = genotypes_parent.to_haplotypes()
-    # Pull out the "left" allele (haplotypes) from the other samples in the VCF, treated as progeny
-    haplotypes_rest_varieties = allel.HaplotypeArray(genotypes_un[:, 1:, 0])
-    # Stack parent's haplotypes alongside haplotypes it transmitted to its progeny
-    haplotypes_parent_n_progeny = haplotypes_parent.concatenate(haplotypes_rest_varieties, axis=1)
-    return haplotypes_parent, haplotypes_parent_n_progeny
+    haplotype_wrapper = _process(vcf_file_path, chrom, sample_list, parental_sample)
+    haplotype_wrapper.calc_homozygous_haplotypes()
+    return haplotype_wrapper
+
+
+def process_heterozygous(vcf_file_path: str, chrom: str,
+                         sample_list: list,
+                         parental_sample: str) -> haplotyper.HaplotypeWrapper:
+    """ Returns a 'haplotyper.HaplotypeWrapper' object.
+
+        Parameters:
+            vcf_file_path (str): Input path to the VCF file.
+            chrom (str): What chromosome should be considered for the haplotype process.
+            sample_list (list :str): Sample list present in the VCF.
+            parental_sample (str): Sample name that is considered as the parental one.
+        Returns:
+           haplotyper.HaplotypeWrapper: Wrapper containing genotypes, variants and homozygous haplotypes.
+    """
+    haplotype_wrapper = _process(vcf_file_path, chrom, sample_list, parental_sample)
+    haplotype_wrapper.calc_heterozygous_haplotypes()
+    return haplotype_wrapper

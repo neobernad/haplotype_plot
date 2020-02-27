@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import unittest
 import os.path
-import haplotyper.conversion as converter
+import haplotype_plot.conversion as converter
 
 
 class TestConversion(unittest.TestCase):
