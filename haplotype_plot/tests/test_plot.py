@@ -1,10 +1,8 @@
 import unittest
-from typing import List
 import logging
 import haplotype_plot.genotyper as genotyper
 import haplotype_plot.conversion as converter
 import haplotype_plot.plot as hplot
-import numpy as np
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
