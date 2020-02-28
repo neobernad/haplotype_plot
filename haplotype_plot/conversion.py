@@ -2,6 +2,7 @@
 import logging
 import vcf  # from PyVCF
 import allel
+import os
 
 logger = logging.getLogger()
 
@@ -31,5 +32,8 @@ def vcf_to_hdf5(vcf_path: str, hdf5_path: str):
 
     """
     logger.debug("Converting VCF file '{vcf_path}'".format(vcf_path=vcf_path))
-    allel.vcf_to_hdf5(vcf_path, hdf5_path, fields='*', overwrite=True)
+    if os.path.exists(hdf5_path):
+        logger.debug("File '{hdf5_path}' already exists. I will remove it.".format(hdf5_path=hdf5_path))
+        os.remove(hdf5_path)
+    allel.vcf_to_hdf5(vcf_path, hdf5_path, fields='*', overwrite=False)
     logger.debug("HDF5 file stored in '{hdf5_path}'".format(hdf5_path=hdf5_path))

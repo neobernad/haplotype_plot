@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import logging
-
 logging.basicConfig(format='%(asctime)s %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s',
                     datefmt='%Y-%m-%d:%H:%M:%S')
 version_info = (1, 0, 0)

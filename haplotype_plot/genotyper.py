@@ -97,9 +97,10 @@ def _sort_genotypes(genotypes: allel.GenotypeChunkedArray,
     return genotype
 
 
-def _process(vcf_file_path: str, chrom: str,
-             sample_list: list,
-             parental_sample: str) -> haplotyper.HaplotypeWrapper:
+def process(vcf_file_path: str, chrom: str,
+            sample_list: list,
+            parental_sample: str,
+            zygosis: haplotyper.Zygosity) -> haplotyper.HaplotypeWrapper:
     """ Returns a 'haplotyper.HaplotypeWrapper' object.
 
         Parameters:
@@ -107,6 +108,7 @@ def _process(vcf_file_path: str, chrom: str,
             chrom (str): What chromosome should be considered for the haplotype process.
             sample_list (list :str): Sample list present in the VCF.
             parental_sample (str): Sample name that is considered as the parental one.
+            zygosis (haplotyper.Zygosity): Whether the VCF has only homozygous variants or has heterozygous
         Returns:
            haplotyper.HaplotypeWrapper: Wrapper containing genotypes and variants.
     """
@@ -130,40 +132,15 @@ def _process(vcf_file_path: str, chrom: str,
     genotypes = _sort_genotypes(genotypes, parental_sample_index)
     genotypes_uc, variants_uc = strainer.filters_for_haplotyping(genotypes, variants, chrom)
     genotypes_uc, variants_uc = strainer.filter_phasing(genotypes_uc, variants_uc)
-    return haplotyper.HaplotypeWrapper(genotypes_uc, variants_uc, chrom, sample_list, parental_sample)
 
+    haplotype_wrapper = haplotyper.HaplotypeWrapper(genotypes_uc, variants_uc, chrom, sample_list, parental_sample)
 
-def process_homozygous(vcf_file_path: str, chrom: str,
-                       sample_list: list,
-                       parental_sample: str) -> haplotyper.HaplotypeWrapper:
-    """ Returns a 'haplotyper.HaplotypeWrapper' object.
-
-        Parameters:
-            vcf_file_path (str): Input path to the VCF file.
-            chrom (str): What chromosome should be considered for the haplotype process.
-            sample_list (list :str): Sample list present in the VCF.
-            parental_sample (str): Sample name that is considered as the parental one.
-        Returns:
-           haplotyper.HaplotypeWrapper: Wrapper containing genotypes, variants and homozygous haplotypes.
-    """
-    haplotype_wrapper = _process(vcf_file_path, chrom, sample_list, parental_sample)
-    haplotype_wrapper.calc_homozygous_haplotypes()
-    return haplotype_wrapper
-
-
-def process_heterozygous(vcf_file_path: str, chrom: str,
-                         sample_list: list,
-                         parental_sample: str) -> haplotyper.HaplotypeWrapper:
-    """ Returns a 'haplotyper.HaplotypeWrapper' object.
-
-        Parameters:
-            vcf_file_path (str): Input path to the VCF file.
-            chrom (str): What chromosome should be considered for the haplotype process.
-            sample_list (list :str): Sample list present in the VCF.
-            parental_sample (str): Sample name that is considered as the parental one.
-        Returns:
-           haplotyper.HaplotypeWrapper: Wrapper containing genotypes, variants and homozygous haplotypes.
-    """
-    haplotype_wrapper = _process(vcf_file_path, chrom, sample_list, parental_sample)
-    haplotype_wrapper.calc_heterozygous_haplotypes()
+    if zygosis == haplotyper.Zygosity.HOM:
+        haplotype_wrapper.calc_homozygous_haplotypes()
+    elif zygosis == haplotyper.Zygosity.HET:
+        haplotype_wrapper.calc_heterozygous_haplotypes()
+    else:
+        msg = "Unknown zygosis '{zygosis}' parameter".format(zygosis=zygosis)
+        logger.error(msg)
+        raise ValueError(msg)
     return haplotype_wrapper

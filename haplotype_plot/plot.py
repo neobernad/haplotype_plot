@@ -83,10 +83,6 @@ class Plotter(object):
         )
         return default_plot_config
 
-    def get_painting(self) -> np.ndarray:
-        return allel.paint_transmission(self.__haplotype_wrapper.parent_haplotypes,
-                                        self.__haplotype_wrapper.parent_n_progeny_haplotypes)
-
     def __get_heterozygous_ytickslabels(self) -> list:
         ytickslabels = list()
         for sample in self.__haplotype_wrapper.sample_list:
@@ -102,9 +98,13 @@ class Plotter(object):
         selected_progeny = np.repeat(True, num_genotypes)
         selected_progeny[parental_sample_index] = False
         ytickslabels: list = [self.__haplotype_wrapper.parent_sample + "_1",
-                             self.__haplotype_wrapper.parent_sample + "_2"]
+                              self.__haplotype_wrapper.parent_sample + "_2"]
         ytickslabels.extend(sample_np_array[selected_progeny])
         return ytickslabels
+
+    def get_painting(self) -> np.ndarray:
+        return allel.paint_transmission(self.__haplotype_wrapper.parent_haplotypes,
+                                        self.__haplotype_wrapper.parent_n_progeny_haplotypes)
 
     def get_ytickslabels(self) -> list:
         if self.__haplotype_wrapper.is_homozygous():
@@ -119,21 +119,15 @@ class Plotter(object):
     def get_xtickslabels(self) -> list:
         return list(self.__haplotype_wrapper.variants["POS"])
 
-    def plot_haplotypes(self, plot_config: PlotConfig = None):
+    def plot_haplotypes(self, plot_config: PlotConfig = None, override_conf: list = None):
         painting = self.get_painting()
         if not plot_config:
             plot_config = self.__default_config()
+        if override_conf:
+            user_conf = parse_conf_parameter(override_conf)
+            for conf_key, conf_val in user_conf.items():
+                setattr(plot_config, conf_key, conf_val)  # Update key values from plot config
         self.plot_transmission(painting, plot_config)
-
-    def _crop_painting_dimension(self, painting: np.ndarray, plot_config: PlotConfig) -> np.ndarray:
-        start: int = plot_config.start
-        end: int = plot_config.end
-
-        if end == 0:  # Show full plot
-            end = len(painting)
-
-        plot_config.xtickslabels = plot_config.xtickslabels[start:end]
-        return painting[start:end]
 
     def plot_transmission(self, painting: np.ndarray, plot_config: PlotConfig):
         fig, ax = plt.subplots(figsize=(plot_config.size_x, plot_config.size_y))
@@ -151,7 +145,7 @@ class Plotter(object):
             'white',  # 7 = missing allele
         ])
         # Delimit painting with user start/end range
-        painting = self._crop_painting_dimension(painting, plot_config)
+        painting = crop_painting_dimension(painting, plot_config)
         # Plot painting
         ax.pcolormesh(painting.T, cmap=cmap, vmin=0, vmax=7)
 
@@ -168,3 +162,50 @@ class Plotter(object):
             ax.set_title(plot_config.title)
         plt.tight_layout()
         plt.show()
+
+
+def parse_key_value_arg(key_value: str) -> (str, str):
+    """
+    Parse a key, value pair, separated by '='
+
+    On the command line (argparse) a declaration will typically look like:
+        foo=hello
+    or
+        foo="hello world"
+    """
+    items = key_value.split('=')
+    key = items[0].strip()  # we remove blanks around keys, as is logical
+    value = ""
+    if len(items) > 1:
+        # rejoin the rest:
+        value = '='.join(items[1:])
+    return key, value
+
+
+def parse_conf_parameter(conf_items: list) -> dict:
+    """
+    Parse a series of key=value pairs and return a dictionary
+    """
+    d = {}
+
+    if conf_items:
+        for item in conf_items:
+            key, value = parse_key_value_arg(item)
+            if value.isdigit():
+                value = int(value)
+            d[key] = value
+    return d
+
+
+def crop_painting_dimension(painting: np.ndarray, plot_config: PlotConfig) -> np.ndarray:
+    start: int = plot_config.start
+    end: int = plot_config.end
+
+    if end == 0:  # Show full plot
+        end = len(painting)
+
+    plot_config.xtickslabels = plot_config.xtickslabels[start:end]
+    #logger.debug("Using {num_variants} variants for plotting.".format(
+    #    num_variants=(end - start)
+    #))
+    return painting[start:end]

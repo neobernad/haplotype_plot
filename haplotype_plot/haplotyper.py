@@ -10,8 +10,8 @@ logger.setLevel(logging.DEBUG)
 
 class Zygosity(Enum):
     UNDEFINED = 1
-    HOMOZYGOUS = 2
-    HETEROZYGOUS = 3
+    HOM = 2  # HOMOZYGOUS
+    HET = 3  # HETEROZYGOUS
 
 
 class HaplotypeWrapper(object):
@@ -77,16 +77,16 @@ class HaplotypeWrapper(object):
         return self.__parent_n_progeny_haplotypes
 
     def is_homozygous(self):
-        return self.__zygosity == Zygosity.HOMOZYGOUS
+        return self.__zygosity == Zygosity.HOM
 
     def is_heterozygous(self):
-        return self.__zygosity == Zygosity.HETEROZYGOUS
+        return self.__zygosity == Zygosity.HET
 
     def __set_homozygous(self):
-        self.__zygosity = Zygosity.HOMOZYGOUS
+        self.__zygosity = Zygosity.HOM
 
     def __set_heterozygous(self):
-        self.__zygosity = Zygosity.HETEROZYGOUS
+        self.__zygosity = Zygosity.HET
 
     def calc_homozygous_haplotypes(self):
         """ Calculates a the parent and progeny haplotypes from a given 'allel.GenotypeArray'.

@@ -2,6 +2,7 @@ import unittest
 import logging
 import haplotype_plot.genotyper as genotyper
 import haplotype_plot.conversion as converter
+import haplotype_plot.haplotyper as haplotyper
 import haplotype_plot.plot as hplot
 
 logger = logging.getLogger(__name__)
@@ -22,22 +23,25 @@ class TestPlotting(unittest.TestCase):
         print(plot_config)
 
     def test_generate_homozygous_yticks(self):
-        haplotype_wrapper = genotyper.process_homozygous(self.vcf_path, self.chrom,
-                                                         self.sample_list, self.parental_sample)
+        heterozygous = haplotyper.Zygosity.HET
+        haplotype_wrapper = genotyper.process(self.vcf_path, self.chrom,
+                                              self.sample_list, self.parental_sample, heterozygous)
         plotter = hplot.Plotter(haplotype_wrapper)
         labels = plotter.get_ytickslabels()
         logger.info(labels)
 
     def test_generate_heterozygous_yticks(self):
-        haplotype_wrapper = genotyper.process_homozygous(self.vcf_path, self.chrom,
-                                                         self.sample_list, self.parental_sample)
+        homozygous = haplotyper.Zygosity.HOM
+        haplotype_wrapper = genotyper.process(self.vcf_path, self.chrom,
+                                              self.sample_list, self.parental_sample, homozygous)
         plotter = hplot.Plotter(haplotype_wrapper)
         labels = plotter.get_ytickslabels()
         logger.info(labels)
 
     def test_plot_homozygous_haplotypes(self):
-        haplotype_wrapper = genotyper.process_homozygous(self.vcf_path, self.chrom,
-                                                         self.sample_list, self.parental_sample)
+        homozygous = haplotyper.Zygosity.HOM
+        haplotype_wrapper = genotyper.process(self.vcf_path, self.chrom,
+                                              self.sample_list, self.parental_sample, homozygous)
         plotter = hplot.Plotter(haplotype_wrapper)
         ytickslabels = plotter.get_ytickslabels()
 
@@ -54,8 +58,9 @@ class TestPlotting(unittest.TestCase):
         plotter.plot_haplotypes(custom_config)
 
     def test_plot_heterozygous_haplotypes(self):
-        haplotype_wrapper = genotyper.process_heterozygous(self.vcf_path, self.chrom,
-                                                           self.sample_list, self.parental_sample)
+        heterozygous = haplotyper.Zygosity.HET
+        haplotype_wrapper = genotyper.process(self.vcf_path, self.chrom,
+                                              self.sample_list, self.parental_sample, heterozygous)
         plotter = hplot.Plotter(haplotype_wrapper)
         plotter.plot_haplotypes()
 
