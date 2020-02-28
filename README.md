@@ -31,8 +31,9 @@ optional arguments:
 
 # Use cases
 
-Plot VCF considering all their variants are homozygous. Only one allele is considered in the plot:
+Plot the haplotypes of a VCF considering all their variants are homozygous, the chromosome `chr01` and the parental line being `SAMPLE1`. Only one allele is considered in the plot:
 
 ```bash
--v "tests/data/chr01.vcf" -c "chr01" -p "SAMPLE1" -z HOM
+python3 haplotype_plot/main.py -v "haplotype_plot/tests/data/chr01.vcf" -c "chr01" -p "SAMPLE1" -z HOM
 ```
+
