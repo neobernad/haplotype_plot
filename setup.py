@@ -14,7 +14,7 @@ setup(
     author_email='joseantonio.bernabe1@um.com',
     entry_points={
         'console_scripts': [
-            'haplotype_plot = haplotype_plot.main',
+            'haplotype_plot = haplotype_plot.main:main',
         ]
     },
     description='Generates haplotype plots from VCF files.', install_requires=['scikit-allel', 'h5py', 'PyVCF',
