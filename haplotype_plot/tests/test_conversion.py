@@ -1,26 +1,28 @@
 # -*- coding: utf-8 -*-
 import unittest
 import os.path
+import os
 import haplotype_plot.conversion as converter
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
 
 
 class TestConversion(unittest.TestCase):
+    vcf_one_chr_path = os.path.join(dir_path, "data/chr01.vcf")
+    hdf5_one_chr_path = os.path.join(dir_path, "data/chr01.h5")
+    vcf_many_chr_path = os.path.join(dir_path, "data/chr01_02_03.vcf")
+    hdf5_many_chr_path = os.path.join(dir_path, "data/chr01_02_03.h5")
 
     def test_vcf_to_hdf5(self):
-        vcf_path = "data/chr01.vcf"
-        hdf5_path = "data/chr01.hdf5"
-        converter.vcf_to_hdf5(vcf_path, hdf5_path)
-        assert os.path.exists(hdf5_path)
+        converter.vcf_to_hdf5(self.vcf_one_chr_path, self.hdf5_one_chr_path)
+        assert os.path.exists(self.hdf5_one_chr_path)
 
-        vcf_path = "data/chr01_02_03.vcf"
-        hdf5_path = "data/chr01_02_03.hdf5"
-        converter.vcf_to_hdf5(vcf_path, hdf5_path)
-        assert os.path.exists(hdf5_path)
+        converter.vcf_to_hdf5(self.vcf_many_chr_path, self.hdf5_many_chr_path)
+        assert os.path.exists(self.hdf5_many_chr_path)
 
     def test_get_samples(self):
-        vcf_path = "data/chr01.vcf"
-        sample_list = converter.get_samples(vcf_path)
-        print("Samples in '{vcf_path}' are: {sample_list}".format(vcf_path=vcf_path,
+        sample_list = converter.get_samples(self.vcf_one_chr_path)
+        print("Samples in '{vcf_path}' are: {sample_list}".format(vcf_path=self.vcf_one_chr_path,
                                                                   sample_list=sample_list))
         assert sample_list
 

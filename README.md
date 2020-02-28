@@ -1,7 +1,7 @@
 # Haplotype plot
 
-Generating haplotypes plots for VCF files.
-*Requires Python 3 to run*.
+Generates haplotype plots for VCF files.
+**Requires Python 3 to run**.
 
 # Usage
 

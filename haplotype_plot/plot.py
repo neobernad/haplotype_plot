@@ -18,15 +18,17 @@ logger.setLevel(logging.DEBUG)
 
 class PlotConfig:
 
-    def __init__(self, title: str = None, xtickslabels=None, ytickslabels=None,
-                 start: int = 0, end: int = 0, size_x: float = 10.0, size_y: float = 3.0):
-        self.title = title
-        self.xtickslabels = xtickslabels
-        self.ytickslabels = ytickslabels
-        self.start = start
-        self.end = end
-        self.size_x = size_x
-        self.size_y = size_y
+    def __init__(self, title: str = None, xtickslabels: list = None, ytickslabels: list = None,
+                 start: int = 0, end: int = 0, size_x: float = 10.0, size_y: float = 3.0,
+                 show: bool = False):
+        self.title: str = title
+        self.xtickslabels: list = xtickslabels
+        self.ytickslabels: list = ytickslabels
+        self.start: int = start
+        self.end: int = end
+        self.size_x: float = size_x
+        self.size_y: float = size_y
+        self.__show: bool = show
         self.__check_properties_integrity()
 
     def __check_properties_integrity(self):
@@ -52,6 +54,15 @@ class PlotConfig:
             )
             logger.error(msg)
             raise ValueError(msg)
+
+    @property
+    def show(self):
+        return self.__show
+
+    @show.setter
+    def show(self, value):
+        value = value.lower() in ['true', '1', 't', 'y', 'yes']
+        self.__show = value
 
     def __str__(self):
         attrs = vars(self)
@@ -161,7 +172,9 @@ class Plotter(object):
         if plot_config.title:
             ax.set_title(plot_config.title)
         plt.tight_layout()
-        plt.show()
+
+        if plot_config.show:
+            plt.show()
 
 
 def parse_key_value_arg(key_value: str) -> (str, str):
@@ -205,7 +218,7 @@ def crop_painting_dimension(painting: np.ndarray, plot_config: PlotConfig) -> np
         end = len(painting)
 
     plot_config.xtickslabels = plot_config.xtickslabels[start:end]
-    #logger.debug("Using {num_variants} variants for plotting.".format(
+    # logger.debug("Using {num_variants} variants for plotting.".format(
     #    num_variants=(end - start)
-    #))
+    # ))
     return painting[start:end]
