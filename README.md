@@ -3,6 +3,8 @@
 Generates haplotype plots for VCF files.
 **Requires Python 3 to run**.
 
+[![Build Status](https://travis-ci.org/neobernad/haplotype_plot.svg?branch=master)](https://travis-ci.org/neobernad/haplotype_plot)
+
 # Usage
 
 ```
