@@ -139,13 +139,14 @@ class Plotter(object):
             user_conf = parse_conf_parameter(override_conf)
             for conf_key, conf_val in user_conf.items():
                 setattr(plot_config, conf_key, conf_val)  # Update key values from plot config
-        if not output_file:
-            output_file = self.__haplotype_wrapper.generate_plot_path()
-        else:
-            output_file = os.path.abspath(output_file)
-        self.plot_transmission(painting, output_file, plot_config)
+        if not plot_config.show: # If not showing plot through screen
+            if not output_file:
+                output_file = self.__haplotype_wrapper.generate_plot_path()
+            else:
+                output_file = os.path.abspath(output_file)
+        self.plot_transmission(painting, plot_config, output_file)
 
-    def plot_transmission(self, painting: np.ndarray, output_file: str, plot_config: PlotConfig):
+    def plot_transmission(self, painting: np.ndarray, plot_config: PlotConfig, output_file: str = None):
         fig, ax = plt.subplots(figsize=(plot_config.size_x, plot_config.size_y))
         palette = sns.color_palette("Spectral", 10)
         # map painting codes onto colours
@@ -177,10 +178,17 @@ class Plotter(object):
             ax.set_title(plot_config.title)
         plt.tight_layout()
 
-        plt.savefig(output_file)
-
         if plot_config.show:
+            logger.info("Showing haplotype plot...")
             plt.show()
+        elif output_file:
+            logger.info("Saving haplotype plot in {output_file}".format(output_file=output_file))
+            plt.savefig(output_file)
+        else:
+            # This should never happen, but report this case to be sure :-)
+            msg = "Could not show nor save haplotype plot"
+            logger.error(msg)
+            raise ValueError(msg)
 
 
 def parse_key_value_arg(key_value: str) -> (str, str):

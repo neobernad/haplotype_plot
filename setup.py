@@ -10,7 +10,7 @@ setup(
     packages=['haplotype_plot', 'haplotype_plot.tests'],
     url='https://github.com/neobernad/haplotype_plot',
     license='MIT',
-    author='José Antonio Bernabé Díaz',
+    author='José Antonio Bernabé-Díaz',
     author_email='joseantonio.bernabe1@um.com',
     entry_points={
         'console_scripts': [
