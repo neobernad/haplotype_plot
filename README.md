@@ -4,6 +4,7 @@ Generates haplotype plots for VCF files.
 **Requires Python 3 to run**.
 
 [![Build Status](https://travis-ci.org/neobernad/haplotype_plot.svg?branch=master)](https://travis-ci.org/neobernad/haplotype_plot)
+[![codecov](https://codecov.io/gh/neobernad/haplotype_plot/branch/master/graph/badge.svg)](https://codecov.io/gh/neobernad/haplotype_plot)
 
 # Usage
 
