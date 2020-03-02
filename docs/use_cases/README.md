@@ -46,7 +46,7 @@ python3 haplotype_plot/main.py  -v "haplotype_plot/tests/data/chr01.vcf" -c "chr
 
 The first three variants in positions chr01:1, chr01:2 and chr01:3 represent the following genotype:
 
-<img src="/use_cases/images/example_3_tsv.png" data-origin="images/example_3_tsv.png" alt="Example 3 table" width="450">
+![Example 3 table](images/example_3_tsv.png)
 
 If we overexpose the VCF file with the plot on the three positions chr01:1, chr01:2 and chr01:3 and the first 4 samples (`SAMPLE4` (*parent*), `SAMPLE1`, `SAMPLE5` and `SAMPLE2`) we obtain the following:
 
