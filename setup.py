@@ -26,7 +26,7 @@ setup(
         ]
     },
     description='Generates haplotype plots from VCF files.',
-    install_requires=['scikit-allel', 'h5py', 'PyVCF', 'numpy', 'matplotlib', 'seaborn'],
+    install_requires=['scikit-allel', 'h5py', 'PyVCF', 'numpy', 'matplotlib', 'seaborn', 'pathlib'],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
