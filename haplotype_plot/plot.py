@@ -70,6 +70,8 @@ class PlotConfig:
 
 
 class Plotter(object):
+    POSTFIX_L_AL = "_1"
+    POSTFIX_R_AL = "_2"
 
     def __init__(self, haplotype_wrapper: haplotyper.HaplotypeWrapper):
         self.__haplotype_wrapper: haplotyper.HaplotypeWrapper = haplotype_wrapper
@@ -96,9 +98,12 @@ class Plotter(object):
 
     def __get_heterozygous_ytickslabels(self) -> list:
         ytickslabels = list()
-        for sample in self.__haplotype_wrapper.sample_list:
-            ytickslabels.append(sample + "_1")
-            ytickslabels.append(sample + "_2")
+        initial_yticks = self.__get_homozygous_ytickslabels()
+        ytickslabels.append(initial_yticks[0])
+        ytickslabels.append(initial_yticks[1])
+        for i in range(2, len(initial_yticks)):  # Skip first two (both parent sample alleles)
+            ytickslabels.append(initial_yticks[i] + self.POSTFIX_L_AL)
+            ytickslabels.append(initial_yticks[i] + self.POSTFIX_R_AL)
         return ytickslabels
 
     def __get_homozygous_ytickslabels(self) -> list:
@@ -108,8 +113,8 @@ class Plotter(object):
                                                            self.__haplotype_wrapper.parent_sample)
         selected_progeny = np.repeat(True, num_genotypes)
         selected_progeny[parental_sample_index] = False
-        ytickslabels: list = [self.__haplotype_wrapper.parent_sample + "_1",
-                              self.__haplotype_wrapper.parent_sample + "_2"]
+        ytickslabels: list = [self.__haplotype_wrapper.parent_sample + self.POSTFIX_L_AL,
+                              self.__haplotype_wrapper.parent_sample + self.POSTFIX_R_AL]
         ytickslabels.extend(sample_np_array[selected_progeny])
         return ytickslabels
 

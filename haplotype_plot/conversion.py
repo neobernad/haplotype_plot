@@ -31,6 +31,7 @@ def vcf_to_hdf5(vcf_path: str, hdf5_path: str):
         hdf5_path (str): Output path to the HDF5 file.
 
     """
+    import h5py
     logger.debug("Converting VCF file '{vcf_path}'".format(vcf_path=vcf_path))
     if os.path.exists(hdf5_path):
         logger.debug("File '{hdf5_path}' already exists. I will remove it.".format(hdf5_path=hdf5_path))

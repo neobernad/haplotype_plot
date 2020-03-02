@@ -131,7 +131,7 @@ def process(vcf_file_path: str, chrom: str,
 
     genotypes = _sort_genotypes(genotypes, parental_sample_index)
     genotypes_uc, variants_uc = strainer.filters_for_haplotyping(genotypes, variants, chrom)
-    genotypes_uc, variants_uc = strainer.filter_phasing(genotypes_uc, variants_uc)
+    #genotypes_uc, variants_uc = strainer.filter_phasing(genotypes_uc, variants_uc)
 
     haplotype_wrapper = haplotyper.HaplotypeWrapper(
         vcf_path, genotypes_uc, variants_uc, chrom, sample_list, parental_sample
