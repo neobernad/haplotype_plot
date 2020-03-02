@@ -52,6 +52,8 @@ If we overexpose the VCF file with the plot on the three positions chr01:1, chr0
 
 ![Example 3 plot with VCF](images/example_3_plot_w_vcf.png)
 
+The meaning of each colour is defined in the [color palette](/usage/?id=color-palette) section.
+
 ## Showing plot on screen
 
 If you wish to see the haplotype plot via GUI instead of a plain `PNG` file, you must then override the default plot configuration through `--conf show=True` argument. For instance:

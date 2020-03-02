@@ -31,3 +31,20 @@ optional arguments:
 For examples of use please go to the [documentation](/use_cases/).
 
 ---
+
+# Color palette
+
+The haplotype plot uses the following color palette to colour alleles:
+
+![Color palette](images/color_palette.png)
+
+The meaning of each colour is:
+
+* 0 = Undetermined
+* 1 = Allele inherited from first parental haplotype
+* 2 = Allele inherited from second parental haplotype
+* 3 = Reference allele, also carried by both parental haplotypes
+* 4 = Non-reference allele, also carried by both parental haplotypes
+* 5 = Non-parental allele
+* 6 = Either or both parental alleles missing
+* 7 = Missing allele
