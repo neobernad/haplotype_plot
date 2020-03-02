@@ -5,7 +5,7 @@ import h5py
 import os
 import os.path
 import haplotype_plot.constants as constants
-import haplotype_plot.conversion as converter
+import haplotype_plot.conversion as io
 import haplotype_plot.filter as strainer
 import haplotype_plot.haplotyper as haplotyper
 import numpy as np
@@ -117,7 +117,7 @@ def process(vcf_file_path: str, chrom: str,
     hdf5_filename = os.path.splitext(vcf_file_abspath)[0] + constants.HDF5_EXT
     hdf5_file_path = os.path.join(vcf_path, hdf5_filename)
 
-    converter.vcf_to_hdf5(vcf_file_path, hdf5_file_path)
+    io.vcf_to_hdf5(vcf_file_path, hdf5_file_path)
 
     parental_sample_index = get_sample_index(sample_list, parental_sample)
     genotypes, variants = get_genotypes_n_variants(hdf5_file_path)
@@ -133,7 +133,9 @@ def process(vcf_file_path: str, chrom: str,
     genotypes_uc, variants_uc = strainer.filters_for_haplotyping(genotypes, variants, chrom)
     genotypes_uc, variants_uc = strainer.filter_phasing(genotypes_uc, variants_uc)
 
-    haplotype_wrapper = haplotyper.HaplotypeWrapper(genotypes_uc, variants_uc, chrom, sample_list, parental_sample)
+    haplotype_wrapper = haplotyper.HaplotypeWrapper(
+        vcf_path, genotypes_uc, variants_uc, chrom, sample_list, parental_sample
+    )
 
     if zygosis == haplotyper.Zygosity.HOM:
         haplotype_wrapper.calc_homozygous_haplotypes()

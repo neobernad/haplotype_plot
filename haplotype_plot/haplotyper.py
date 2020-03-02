@@ -2,6 +2,7 @@
 import logging
 import allel
 import numpy as np
+import os
 from enum import Enum
 
 logger = logging.getLogger(__name__)
@@ -15,9 +16,11 @@ class Zygosity(Enum):
 
 
 class HaplotypeWrapper(object):
+    DEFAULT_PLOT_NAME = "haplotypes.png"
 
     """
     Class to wrap the following information:
+        * __input_path (str): Absolute path where the input data is.
         * __genotypes (allel.GenotypeArray): Genotypes in the current analysis.
         * __variants (allel.VariantTable): Variants in the current analysis.
         * __chrom (str): Chromosome where variants/genotypes are
@@ -28,8 +31,10 @@ class HaplotypeWrapper(object):
         * __parent_n_progeny_haplotypes (allel.HaplotypeArray): Parent haplotypes concatenated with progeny haplotypes.
     """
 
-    def __init__(self, genotypes: allel.GenotypeArray, variants: allel.VariantTable,
-                 chrom: str, sample_list: list, parent_sample: str):
+    def __init__(self, input_path: str, genotypes: allel.GenotypeArray,
+                 variants: allel.VariantTable, chrom: str, sample_list: list,
+                 parent_sample: str):
+        self.__input_path: str = input_path
         self.__genotypes: allel.GenotypeArray = genotypes
         self.__variants: allel.VariantTable = variants
         self.__chrom: str = chrom
@@ -47,6 +52,10 @@ class HaplotypeWrapper(object):
     def __str__(self):
         attrs = vars(self)
         return ', '.join("%s: %s" % item for item in attrs.items())
+
+    @property
+    def input_path(self) -> str:
+        return self.__input_path
 
     @property
     def genotypes(self) -> allel.GenotypeArray:
@@ -75,6 +84,9 @@ class HaplotypeWrapper(object):
     @property
     def parent_n_progeny_haplotypes(self) -> allel.HaplotypeArray:
         return self.__parent_n_progeny_haplotypes
+
+    def generate_plot_path(self) -> str:
+        return os.path.join(self.input_path, self.DEFAULT_PLOT_NAME)
 
     def is_homozygous(self):
         return self.__zygosity == Zygosity.HOM

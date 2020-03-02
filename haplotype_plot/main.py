@@ -11,6 +11,8 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Creates a haplotype plot from a VCF file")
     parser.add_argument('-v', '--vcf', required=True, action='store',
                         help="path to the input VCF file")
+    parser.add_argument('-o', '--output', required=False, action='store',
+                        help="path to the output PNG haplotype plot file")
     parser.add_argument('-c', '--chr', required=True, action='store',
                         help="chromosome to plot from the VCF")
     parser.add_argument('-p', '--parental', required=True, action='store',
@@ -37,8 +39,9 @@ def main():
     haplotype_wrapper = genotyper.process(args.vcf, args.chr,
                                           sample_list, args.parental,
                                           haplotyper.Zygosity[args.zygosis])
+
     plotter = hplot.Plotter(haplotype_wrapper)
-    plotter.plot_haplotypes(override_conf=args.conf)
+    plotter.plot_haplotypes(output_file=args.output, override_conf=args.conf)
 
 
 if __name__ == '__main__':
