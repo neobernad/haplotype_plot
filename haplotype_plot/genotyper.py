@@ -5,7 +5,7 @@ import h5py
 import os
 import os.path
 import haplotype_plot.constants as constants
-import haplotype_plot.conversion as io
+import haplotype_plot.reader as reader
 import haplotype_plot.filter as strainer
 import haplotype_plot.haplotyper as haplotyper
 import numpy as np
@@ -16,13 +16,14 @@ logger.setLevel(logging.DEBUG)
 
 def debug_hdf5(hdf5_path: str):
     callset = h5py.File(hdf5_path, mode='r')
+    logger.debug("Callset keys: {keys}".format(keys=callset.keys()))
     logger.debug("Callset keys of {key}: '{values}'".format(key=constants.HDF5_CALLDATA_KEY,
                                                             values=callset[constants.HDF5_CALLDATA_KEY].keys()))
     logger.debug("Callset keys of {key}: '{values}'".format(key=constants.HDF5_VARIANTS_KEY,
                                                             values=callset[constants.HDF5_VARIANTS_KEY].keys()))
 
 
-def get_genotypes_n_variants(hdf5_path: str) -> (allel.GenotypeChunkedArray, allel.VariantChunkedTable):
+def get_genotypes_n_variants(callset: h5py.File) -> (allel.GenotypeChunkedArray, allel.VariantChunkedTable):
     """ Returns a the genotypes and variants tables from an hdf5.
 
     Parameters:
@@ -32,8 +33,6 @@ def get_genotypes_n_variants(hdf5_path: str) -> (allel.GenotypeChunkedArray, all
             - allel.GenotypeChunkedArray as the genotypes table
             - allel.VariantChunkedTable as the variants table with columns 'CHROM' and 'POS'
     """
-    logger.debug("Loading HDF5 file '{hdf5_path}'".format(hdf5_path=hdf5_path))
-    callset = h5py.File(hdf5_path, mode='r')
     logger.debug("Retrieving genotypes via '{key}' key".format(key=constants.HDF5_CALLDATA_GENOTYPE_KEY))
     genotypes = allel.GenotypeChunkedArray(callset['calldata/GT'])
     logger.debug("Retrieving variants via '{key}' key'".format(key=constants.HDF5_VARIANTS_KEY))
@@ -98,7 +97,6 @@ def _sort_genotypes(genotypes: allel.GenotypeChunkedArray,
 
 
 def process(vcf_file_path: str, chrom: str,
-            sample_list: list,
             parental_sample: str,
             zygosis: haplotyper.Zygosity) -> haplotyper.HaplotypeWrapper:
     """ Returns a 'haplotyper.HaplotypeWrapper' object.
@@ -106,7 +104,6 @@ def process(vcf_file_path: str, chrom: str,
         Parameters:
             vcf_file_path (str): Input path to the VCF file.
             chrom (str): What chromosome should be considered for the haplotype process.
-            sample_list (list :str): Sample list present in the VCF.
             parental_sample (str): Sample name that is considered as the parental one.
             zygosis (haplotyper.Zygosity): Whether the VCF has only homozygous variants or has heterozygous
         Returns:
@@ -117,10 +114,12 @@ def process(vcf_file_path: str, chrom: str,
     hdf5_filename = os.path.splitext(vcf_file_abspath)[0] + constants.HDF5_EXT
     hdf5_file_path = os.path.join(vcf_path, hdf5_filename)
 
-    io.vcf_to_hdf5(vcf_file_path, hdf5_file_path)
-
+    reader.vcf_to_hdf5(vcf_file_path, hdf5_file_path)
+    logger.debug("Loading HDF5 file '{hdf5_path}'".format(hdf5_path=hdf5_file_path))
+    callset = h5py.File(hdf5_file_path, mode='r')
+    sample_list = list(callset["samples"])
     parental_sample_index = get_sample_index(sample_list, parental_sample)
-    genotypes, variants = get_genotypes_n_variants(hdf5_file_path)
+    genotypes, variants = get_genotypes_n_variants(callset)
     if not _has_chromosome(variants, chrom):
         msg = "Chromosome '{chrom}' not found in the VCF '{vcf_file_path}'".format(
             chrom=chrom,
@@ -131,7 +130,7 @@ def process(vcf_file_path: str, chrom: str,
 
     genotypes = _sort_genotypes(genotypes, parental_sample_index)
     genotypes_uc, variants_uc = strainer.filters_for_haplotyping(genotypes, variants, chrom)
-    #genotypes_uc, variants_uc = strainer.filter_phasing(genotypes_uc, variants_uc)
+    genotypes_uc, variants_uc = strainer.filter_phasing(genotypes_uc, variants_uc)
 
     haplotype_wrapper = haplotyper.HaplotypeWrapper(
         vcf_path, genotypes_uc, variants_uc, chrom, sample_list, parental_sample

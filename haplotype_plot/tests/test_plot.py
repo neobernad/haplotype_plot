@@ -2,7 +2,7 @@ import unittest
 import logging
 import os
 import haplotype_plot.genotyper as genotyper
-import haplotype_plot.conversion as converter
+import haplotype_plot.reader as reader
 import haplotype_plot.haplotyper as haplotyper
 import haplotype_plot.plot as hplot
 
@@ -19,7 +19,7 @@ class TestPlotting(unittest.TestCase):
     sample_list = None
 
     def setUp(self) -> None:
-        self.sample_list = converter.get_samples(self.vcf_path)
+        self.sample_list = reader.get_samples(self.vcf_path)
 
     def test_plot_config(self):
         plot_config = hplot.PlotConfig()

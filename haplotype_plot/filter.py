@@ -13,8 +13,29 @@ def variants_filter(variants: allel.VariantChunkedTable, filter_expression: str)
     return variant_selection
 
 
+def variants_filter(variants: allel.VariantTable, filter_expression: str) -> np.ndarray:
+    print("expr: " + filter_expression)
+    variant_selection = variants.eval(filter_expression)
+    return variant_selection
+
+
 def variants_filter_by_chrom(variants: allel.VariantChunkedTable, chrom: str) -> np.ndarray:
     filter_expression = '(CHROM == \'' + chrom + '\')'
+    return variants_filter(variants, filter_expression)
+
+
+def variants_filter_by_chrom(variants: allel.VariantTable, chrom: str) -> np.ndarray:
+    filter_expression = '(CHROM == \'' + chrom + '\')'
+    return variants_filter(variants, filter_expression)
+
+
+def variants_filter_by_chrom_n_pos(variants: allel.VariantChunkedTable, chrom: str, pos: int) -> np.ndarray:
+    filter_expression = '(CHROM == \'' + chrom + '\') & (POS == ' + str(pos) + ')'
+    return variants_filter(variants, filter_expression)
+
+
+def variants_filter_by_chrom_n_pos(variants: allel.VariantTable, chrom: str, pos: int) -> np.ndarray:
+    filter_expression = '(CHROM == \'' + chrom + '\') & (POS == ' + str(pos) + ')'
     return variants_filter(variants, filter_expression)
 
 

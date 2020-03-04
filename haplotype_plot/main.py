@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import haplotype_plot.genotyper as genotyper
-import haplotype_plot.conversion as converter
+import haplotype_plot.reader as reader
 import haplotype_plot.haplotyper as haplotyper
 import haplotype_plot.plot as hplot
 import haplotype_plot
@@ -10,7 +10,7 @@ import argparse
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Creates a haplotype plot from a VCF file")
     parser.add_argument('-v', '--vcf', required=True, action='store',
-                        help="path to the input VCF file")
+                        help="path to the input sorted VCF file")
     parser.add_argument('-o', '--output', required=False, action='store',
                         help="path to the output PNG haplotype plot file")
     parser.add_argument('-c', '--chr', required=True, action='store',
@@ -35,9 +35,8 @@ def parse_args() -> argparse.Namespace:
 
 def main():
     args = parse_args()
-    sample_list = converter.get_samples(args.vcf)
-    haplotype_wrapper = genotyper.process(args.vcf, args.chr,
-                                          sample_list, args.parental,
+    #sample_list = reader.get_samples(args.vcf)
+    haplotype_wrapper = genotyper.process(args.vcf, args.chr, args.parental,
                                           haplotyper.Zygosity[args.zygosis])
 
     plotter = hplot.Plotter(haplotype_wrapper)
