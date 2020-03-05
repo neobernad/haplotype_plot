@@ -14,7 +14,6 @@ def variants_filter(variants: allel.VariantChunkedTable, filter_expression: str)
 
 
 def variants_filter(variants: allel.VariantTable, filter_expression: str) -> np.ndarray:
-    print("expr: " + filter_expression)
     variant_selection = variants.eval(filter_expression)
     return variant_selection
 
