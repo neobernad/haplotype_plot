@@ -39,6 +39,7 @@ class TestGenotyper(unittest.TestCase):
 
     # Find current chrom and pos in the VCF
     # vcf_reader.fetch is faster, but requires pysam and it will not work on windows
+    @unittest.skip("Not completed")
     def test_save(self):
         haplotype_wrapper = genotyper.process(self.vcf_one_chr_path, self.chrom, self.parental_sample,
                                               Zygosity.HOM)

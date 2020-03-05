@@ -22,8 +22,8 @@ class TestConversion(unittest.TestCase):
         reader.vcf_to_hdf5(self.vcf_many_chr_path, self.hdf5_many_chr_path)
         assert os.path.exists(self.hdf5_many_chr_path)
 
-    def test_hdf5_to_vcf(self):
-        writer.hdf5_to_vcf(self.hdf5_many_chr_path)
+    #def test_hdf5_to_vcf(self):
+    #    writer.hdf5_to_vcf(self.hdf5_many_chr_path)
 
     def test_get_samples(self):
         sample_list = reader.get_samples(self.vcf_one_chr_path)
