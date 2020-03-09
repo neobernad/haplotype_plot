@@ -9,4 +9,12 @@ The package [haplotype_plot](https://github.com/neobernad/haplotype_plot/) gener
 [![Build Status](https://travis-ci.org/neobernad/haplotype_plot.svg?branch=master)](https://travis-ci.org/neobernad/haplotype_plot)
 [![codecov](https://codecov.io/gh/neobernad/haplotype_plot/branch/master/graph/badge.svg)](https://codecov.io/gh/neobernad/haplotype_plot)
 
+# Pypi
+
+You may install haplotype plot from pip:
+
+```bash
+pip install haplotype-plot
+```
+
 ?> Please report any package issue through github [issues](https://github.com/neobernad/haplotype_plot/issues).

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import haplotype_plot.genotyper as genotyper
-import haplotype_plot.reader as reader
+import haplotype_plot.writer as writer
 import haplotype_plot.haplotyper as haplotyper
 import haplotype_plot.plot as hplot
 import haplotype_plot
@@ -17,6 +17,9 @@ def parse_args() -> argparse.Namespace:
                         help="chromosome to plot from the VCF")
     parser.add_argument('-p', '--parental', required=True, action='store',
                         help="sample name from the VCF used as parental haplotype")
+    parser.add_argument('--phase', required=False, action='store_true',
+                        help="if specified, it will phase the genotypes. "
+                             "An output VCF with the phased genotypes is created")
     parser.add_argument('--version', action='version',
                         version='version: {version}'.format(version=haplotype_plot.version))
     parser.add_argument('-z', '--zygosis', help="zygosis of the input VCF file",
@@ -35,12 +38,13 @@ def parse_args() -> argparse.Namespace:
 
 def main():
     args = parse_args()
-    #sample_list = reader.get_samples(args.vcf)
     haplotype_wrapper = genotyper.process(args.vcf, args.chr, args.parental,
                                           haplotyper.Zygosity[args.zygosis])
 
     plotter = hplot.Plotter(haplotype_wrapper)
     plotter.plot_haplotypes(output_file=args.output, override_conf=args.conf)
+    if args.phase:
+        writer.save_phased_variants(haplotype_wrapper, args.vcf)
 
 
 if __name__ == '__main__':

@@ -14,10 +14,23 @@ logger.setLevel(logging.DEBUG)
 
 def save_phased_variants(haplotype_wrapper: HaplotypeWrapper,
                          input_vcf_file: str, output_vcf_file: str = None):
+    """ Saves a file with the phased variants from the object HaplotypeWrapper.
+
+        Parameters:
+            haplotype_wrapper (HaplotypeWrapper): HaplotypeWrapper object.
+            input_vcf_file (str): Path of the input VCF file
+            output_vcf_file (str): Output VCF phased file. If 'None' specified,
+            the output file is calculated based on the input_vcf_file parameter.
+            For instance:
+                input_vcf_file = "/path/to/vcf/file.vcf"
+                Then, if 'output_vcf_file' is None, the following path is generated:
+                output_vcf_file = "/path/to/vcf/file.phased.vcf"
+
+    """
     # https://github.com/jamescasbon/PyVCF/issues/82
     if output_vcf_file is None:
         output_vcf_file = os.path.splitext(os.path.abspath(input_vcf_file))[0] + ".phased.vcf"
-    logger.debug("Saving variants...")
+    logger.debug("Saving phased variants...")
     fp_vcf_file = open(input_vcf_file, 'r')
     fp_output_vcf_file = open(output_vcf_file, 'w')
     vcf_reader = vcf.Reader(fp_vcf_file)

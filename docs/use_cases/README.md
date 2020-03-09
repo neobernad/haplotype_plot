@@ -9,7 +9,7 @@ Plot the haplotypes of a VCF considering the following assumptions: their varian
 **Parental line is always shown as the first element in the Y axis.**
 
 ```bash
-python3 haplotype_plot/main.py -v "haplotype_plot/tests/data/chr01.vcf" -c "chr01" -p "SAMPLE1" -z HOM
+haplotype_plot -v "haplotype_plot/tests/data/chr01.vcf" -c "chr01" -p "SAMPLE1" -z HOM
 ```
 
 ![Example 1](images/example_1.png)
@@ -19,7 +19,7 @@ Both alleles from parental `SAMPLE1` are distinguished via `_1` and `_2` postfix
 By default, the haplotype plot is saved in the directory where the input data is, in this case `haplotype_plot/tests/data/`, with name `haplotypes.png`. You can override this behaviour by specifying an output file path via `-o` or `--output` arguments as in:
 
 ```bash
-python3 haplotype_plot/main.py -v "haplotype_plot/tests/data/chr01.vcf" -c "chr01" -p "SAMPLE1" -z HOM -o "/path/to/plot.png"
+haplotype_plot -v "haplotype_plot/tests/data/chr01.vcf" -c "chr01" -p "SAMPLE1" -z HOM -o "/path/to/plot.png"
 ```
 
 ## Homozygous VCF, X axis redimension
@@ -27,7 +27,7 @@ python3 haplotype_plot/main.py -v "haplotype_plot/tests/data/chr01.vcf" -c "chr0
 In the use case shown above we had **too many** variants in the X axis to display, right? We can redimension this axis via `start` and `end` configuration (`--conf`) arguments:
 
 ```bash
-python3 haplotype_plot/main.py  -v "haplotype_plot/tests/data/chr01.vcf" -c "chr01" -p "SAMPLE1" -z HOM --conf start=100 end=150
+haplotype_plot  -v "haplotype_plot/tests/data/chr01.vcf" -c "chr01" -p "SAMPLE1" -z HOM --conf start=100 end=150
 ```
 
 ![Example 2](images/example_2.png)
@@ -39,7 +39,7 @@ The plot shows the 100th variant (1893) until the 150th one (2901).
 For heterozygous variants in the VCF both alleles are reported in the plot:
 
 ```bash
-python3 haplotype_plot/main.py  -v "haplotype_plot/tests/data/chr01.vcf" -c "chr01" -p "SAMPLE4" -z HET --conf start=0 end=10
+haplotype_plot  -v "haplotype_plot/tests/data/chr01.vcf" -c "chr01" -p "SAMPLE4" -z HET --conf start=0 end=10
 ```
 
 ![Example 3](images/example_3.png)
@@ -59,7 +59,26 @@ The meaning of each colour is defined in the [color palette](/usage/?id=color-pa
 If you wish to see the haplotype plot via GUI instead of a plain `PNG` file, you must then override the default plot configuration through `--conf show=True` argument. For instance:
 
 ```bash
-python3 haplotype_plot/main.py -v "haplotype_plot/tests/data/chr01.vcf" -c "chr01" -p "SAMPLE1" -z HOM --conf show=True
+haplotype_plot -v "haplotype_plot/tests/data/chr01.vcf" -c "chr01" -p "SAMPLE1" -z HOM --conf show=True
 ```
 
 By default `show` is set to `False`.
+
+## Phasing genotypes
+
+A phasing procedure is considered in the haplotyping if the parameter `--phase` is specified, as in:
+
+```bash
+haplotype_plot -v "haplotype_plot/tests/data/chr01.vcf" -c "chr01" -p "SAMPLE1" -z HOM --conf show=True --phase
+```
+
+As a result the phased genotypes are stored in the same path as in the input file. For instance, since the input file is `"haplotype_plot/tests/data/chr01.vcf"`, the phased genotypes would be saved in the following file: `"haplotype_plot/tests/data/chr01.phased.vcf"`.
+
+## Using haplotype plot from source
+
+If you wish to use the latest development version of haplotype plot, clone the repository and run the tool as follows:
+
+```bash
+python3 haplotype_plot/main.py -v "haplotype_plot/tests/data/chr01.vcf" -c "chr01" -p "SAMPLE1" -z HOM --conf show=True
+```
+
