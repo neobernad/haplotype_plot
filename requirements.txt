@@ -1,6 +1,6 @@
 ﻿atomicwrites==1.3.0
 attrs==19.3.0
-bleach==3.1.2
+bleach==3.1.4
 certifi==2019.11.28
 chardet==3.0.4
 codecov==2.0.16
