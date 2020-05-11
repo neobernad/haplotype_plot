@@ -38,10 +38,11 @@ optional arguments:
   --conf KEY=VALUE [KEY=VALUE ...]
                         set a number of key-value pairs to modify the default
                         plot configuration (do not put spaces before or after
-                        the = sign). Possible values are: 'start=integer',
-                        'end=integer'. If a value contains spaces, you should
+                        the = sign). If a value contains spaces, you should
                         define it with double quotes: foo="this is a
-                        sentence".
+                        sentence". Possible values are: 'start=integer',
+                        'end=integer', 'show=boolean', 'xtickslabels=boolean',
+                        'size_y=float'
 ```
 
 For examples of use please go to the [documentation](https://neobernad.github.io/haplotype_plot/#/).

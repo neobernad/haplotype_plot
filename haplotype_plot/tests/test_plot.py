@@ -58,7 +58,7 @@ class TestPlotting(unittest.TestCase):
             end=1000,
             size_x=10,
             size_y=len(ytickslabels) * .2,
-            show=False
+            show=True
         )
 
         plotter.plot_haplotypes(custom_config)
@@ -68,7 +68,7 @@ class TestPlotting(unittest.TestCase):
         haplotype_wrapper = genotyper.process(self.vcf_path, self.chrom,
                                               self.parental_sample, heterozygous)
         plotter = hplot.Plotter(haplotype_wrapper)
-        user_conf = list(["show=False"])
+        user_conf = list(["show=False", "xtickslabels=False", "size_y=5"])
         plotter.plot_haplotypes(override_conf=user_conf)
 
 

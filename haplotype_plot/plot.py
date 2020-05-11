@@ -92,7 +92,7 @@ class Plotter(object):
             start=0,
             end=0,
             size_x=10,
-            size_y=len(ytickslabels) * .2
+            size_y=len(ytickslabels) * .35
         )
         return default_plot_config
 
@@ -135,6 +135,10 @@ class Plotter(object):
     def get_xtickslabels(self) -> list:
         return list(self.__haplotype_wrapper.variants["POS"])
 
+    def _str_get_boolean(self, str) -> bool:
+        d = {'True': True, 'False': False}
+        return d.get(str, None)
+
     def plot_haplotypes(self, plot_config: PlotConfig = None, output_file: str = None,
                         override_conf: list = None):
         painting = self.get_painting()
@@ -143,6 +147,17 @@ class Plotter(object):
         if override_conf:
             user_conf = parse_conf_parameter(override_conf)
             for conf_key, conf_val in user_conf.items():
+                if conf_key == "xtickslabels":
+                    value = self._str_get_boolean(conf_val)
+                    if value is not None:
+                        if value is False:
+                            conf_val = list()  # Empty list for xtickslabels -> hiding X ticks
+                        else:
+                            continue
+                    else:
+                        msg = "Invalid configuration value '" + conf_val + "' for key '" + conf_key + "'"
+                        logger.error(msg)
+                        raise ValueError(msg)
                 setattr(plot_config, conf_key, conf_val)  # Update key values from plot config
         if not plot_config.show: # If not showing plot through screen
             if not output_file:
