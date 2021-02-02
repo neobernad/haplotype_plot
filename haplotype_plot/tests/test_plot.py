@@ -17,6 +17,7 @@ class TestPlotting(unittest.TestCase):
     chrom = "chr01"
     parental_sample = "SAMPLE4"
     sample_list = None
+    phase = False
 
     def setUp(self) -> None:
         self.sample_list = reader.get_samples(self.vcf_path)
@@ -28,7 +29,7 @@ class TestPlotting(unittest.TestCase):
     def test_generate_heterozygous_yticks(self):
         heterozygous = haplotyper.Zygosity.HET
         haplotype_wrapper = genotyper.process(self.vcf_path, self.chrom,
-                                              self.parental_sample, heterozygous)
+                                              self.parental_sample, self.phase, heterozygous)
         plotter = hplot.Plotter(haplotype_wrapper)
         labels = plotter.get_ytickslabels()
         logger.debug("Parent: {parent}".format(parent=self.parental_sample))
@@ -37,7 +38,7 @@ class TestPlotting(unittest.TestCase):
     def test_generate_homozygous_yticks(self):
         homozygous = haplotyper.Zygosity.HOM
         haplotype_wrapper = genotyper.process(self.vcf_path, self.chrom,
-                                              self.parental_sample, homozygous)
+                                              self.parental_sample, self.phase, homozygous)
         plotter = hplot.Plotter(haplotype_wrapper)
         labels = plotter.get_ytickslabels()
         logger.debug("Parent: {parent}".format(parent=self.parental_sample))
@@ -46,7 +47,7 @@ class TestPlotting(unittest.TestCase):
     def test_plot_homozygous_haplotypes(self):
         homozygous = haplotyper.Zygosity.HOM
         haplotype_wrapper = genotyper.process(self.vcf_path, self.chrom,
-                                              self.parental_sample, homozygous)
+                                              self.parental_sample, self.phase, homozygous)
         plotter = hplot.Plotter(haplotype_wrapper)
         ytickslabels = plotter.get_ytickslabels()
 
@@ -66,7 +67,7 @@ class TestPlotting(unittest.TestCase):
     def test_plot_heterozygous_haplotypes(self):
         heterozygous = haplotyper.Zygosity.HET
         haplotype_wrapper = genotyper.process(self.vcf_path, self.chrom,
-                                              self.parental_sample, heterozygous)
+                                              self.parental_sample, self.phase, heterozygous)
         plotter = hplot.Plotter(haplotype_wrapper)
         user_conf = list(["show=False", "xtickslabels=False", "size_y=5"])
         plotter.plot_haplotypes(override_conf=user_conf)

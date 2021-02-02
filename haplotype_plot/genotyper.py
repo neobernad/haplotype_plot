@@ -97,7 +97,7 @@ def _sort_genotypes(genotypes: allel.GenotypeChunkedArray,
 
 
 def process(vcf_file_path: str, chrom: str,
-            parental_sample: str,
+            parental_sample: str, phase: bool,
             zygosis: haplotyper.Zygosity) -> haplotyper.HaplotypeWrapper:
     """ Returns a 'haplotyper.HaplotypeWrapper' object.
 
@@ -130,7 +130,8 @@ def process(vcf_file_path: str, chrom: str,
 
     genotypes = _sort_genotypes(genotypes, parental_sample_index)
     genotypes_uc, variants_uc = strainer.filters_for_haplotyping(genotypes, variants, chrom)
-    genotypes_uc, variants_uc = strainer.filter_phasing(genotypes_uc, variants_uc)
+    if phase:
+        genotypes_uc, variants_uc = strainer.filter_phasing(genotypes_uc, variants_uc)
 
     haplotype_wrapper = haplotyper.HaplotypeWrapper(
         vcf_path, genotypes_uc, variants_uc, chrom, sample_list, parental_sample

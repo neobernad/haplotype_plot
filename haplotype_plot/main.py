@@ -38,7 +38,7 @@ def parse_args() -> argparse.Namespace:
 
 def main():
     args = parse_args()
-    haplotype_wrapper = genotyper.process(args.vcf, args.chr, args.parental,
+    haplotype_wrapper = genotyper.process(args.vcf, args.chr, args.parental, args.phase,
                                           haplotyper.Zygosity[args.zygosis])
 
     plotter = hplot.Plotter(haplotype_wrapper)

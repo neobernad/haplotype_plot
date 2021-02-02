@@ -20,6 +20,7 @@ class TestGenotyper(unittest.TestCase):
     vcf_one_chr_path = os.path.join(dir_path, "data/chr01.vcf")
     hdf5_one_chr_path = os.path.join(dir_path, "data/chr01.h5")
     chrom = "chr01"
+    phase = False
     parental_sample = "SAMPLE1"
     sample_list = None
 
@@ -28,12 +29,12 @@ class TestGenotyper(unittest.TestCase):
 
     def test_genotype_n_variants(self):
         haplotype_wrapper = genotyper.process(self.vcf_one_chr_path, self.chrom, self.parental_sample,
-                                              Zygosity.HOM)
+                                              self.phase, Zygosity.HOM)
         assert haplotype_wrapper
 
     def test_genotype_filtering(self):
         haplotype_wrapper = genotyper.process(self.vcf_one_chr_path, self.chrom, self.parental_sample,
-                                              Zygosity.HOM)
+                                              self.phase, Zygosity.HOM)
         genotypes_uc_len = len(haplotype_wrapper.genotypes)
         variants_uc_len = len(haplotype_wrapper.variants)
         logger.debug("Length genotypes: {length}".format(length=genotypes_uc_len))
@@ -42,7 +43,7 @@ class TestGenotyper(unittest.TestCase):
 
     def test_save_phased_variants(self):
         haplotype_wrapper = genotyper.process(self.vcf_one_chr_path, self.chrom, self.parental_sample,
-                                              Zygosity.HOM)
+                                              True, Zygosity.HOM)
         assert haplotype_wrapper
         writer.save_phased_variants(haplotype_wrapper, self.vcf_one_chr_path)
 
