@@ -8,7 +8,7 @@ colorama==0.4.3
 coverage==5.0.3
 cycler==0.10.0
 Cython==0.29.15
-dask==2.11.0
+dask==2021.10.0
 docutils==0.16
 h5py==2.10.0
 idna==2.9
